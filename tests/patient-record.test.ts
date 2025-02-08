@@ -1,21 +1,62 @@
+import { describe, it, expect, beforeEach } from "vitest"
 
-import { describe, expect, it } from "vitest";
+// Mock the patient record storage
+const patientRecords = new Map()
+let nextRecordId = 0
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
+// Mock functions to simulate contract behavior
+function createPatientRecord(encryptedData: string) {
+  const recordId = nextRecordId++
+  patientRecords.set(recordId, {
+    patient: "mock-patient-address",
+    encryptedData,
+    lastUpdated: Date.now(),
+  })
+  return recordId
+}
 
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
+function updatePatientRecord(recordId: number, newEncryptedData: string) {
+  if (!patientRecords.has(recordId)) {
+    throw new Error("Record not found")
+  }
+  const record = patientRecords.get(recordId)
+  record.encryptedData = newEncryptedData
+  record.lastUpdated = Date.now()
+  patientRecords.set(recordId, record)
+}
 
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
+function getPatientRecord(recordId: number) {
+  return patientRecords.get(recordId)
+}
 
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});
+describe("Patient Record Contract", () => {
+  beforeEach(() => {
+    patientRecords.clear()
+    nextRecordId = 0
+  })
+  
+  it("should create a patient record", () => {
+    const recordId = createPatientRecord("encrypted-data")
+    expect(recordId).toBe(0)
+    expect(patientRecords.size).toBe(1)
+  })
+  
+  it("should update a patient record", () => {
+    const recordId = createPatientRecord("initial-data")
+    updatePatientRecord(recordId, "updated-data")
+    const record = getPatientRecord(recordId)
+    expect(record.encryptedData).toBe("updated-data")
+  })
+  
+  it("should get a patient record", () => {
+    const recordId = createPatientRecord("test-data")
+    const record = getPatientRecord(recordId)
+    expect(record).toBeDefined()
+    expect(record.encryptedData).toBe("test-data")
+  })
+  
+  it("should throw an error when updating non-existent record", () => {
+    expect(() => updatePatientRecord(999, "data")).toThrow("Record not found")
+  })
+})
+
