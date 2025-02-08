@@ -11,3 +11,5 @@ U
 %tests/prescription-management.test.ts,7/5/75ede8bca0acdfffaf87aa0dc2c343737368a738
 T
 $contracts/research-data-sharing.clar,4/e/4ecf40079ce62a5fb0f1503e7b579023a43cb265
+S
+#tests/research-data-sharing.test.ts,0/4/042c47849a3ba590b82932f3e0b4f06e626bd495
